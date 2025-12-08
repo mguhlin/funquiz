@@ -38,8 +38,24 @@ function showResult() {
   const topCharacter = Object.entries(scores)
     .sort((a, b) => b[1] - a[1])[0][0];
 
-  document.getElementById('result-box').innerHTML =
-    `<h2>You are: ${topCharacter}!</h2>`;
+  const imageMap = {
+    "Winnie the Pooh": "pooh.png",
+    "Smurfette": "smurfette.png",
+    "Snow White": "snowwhite.png",
+    "Bugs Bunny": "bugs.png"
+  };
+
+  const imageFile = imageMap[topCharacter];
+
+  let imageHTML = "";
+  if (imageFile) {
+    imageHTML = `<img src="assets/${imageFile}" alt="${topCharacter}" style="max-width: 200px; margin-top: 20px;" />`;
+  }
+
+  document.getElementById('result-box').innerHTML = `
+    <h2>You are: ${topCharacter}!</h2>
+    ${imageHTML}
+  `;
 }
 
 window.onload = showQuestion;
