@@ -1,5 +1,20 @@
+// ⬇️ Paste your Google Apps Script Web App URL here
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxm7ILbwOaahd3VZ9nkeyVEnhokeOy3le-iiON5NBwY40NqtAXhwPc6512U5o5C_sXJ/exec";
+
 let currentQuestion = 0;
 let scores = {};
+let quizName = "";
+
+function getQuizName() {
+  const page = location.pathname.split("/").pop() || "index.html";
+  const map = {
+    "index.html": "Winnie the Pooh",
+    "smurfs.html": "The Smurfs",
+    "dwarfs.html": "Snow White",
+    "looney.html": "Looney Tunes"
+  };
+  return map[page] || page;
+}
 
 function nextQuestion() {
   const selected = document.querySelector('input[name="answer"]:checked');
@@ -46,7 +61,6 @@ function showResult() {
   };
 
   const imageFile = imageMap[topCharacter];
-
   let imageHTML = "";
   if (imageFile) {
     imageHTML = `<img src="assets/${imageFile}" alt="${topCharacter}" style="max-width: 200px; margin-top: 20px;" />`;
@@ -56,6 +70,28 @@ function showResult() {
     <h2>You are: ${topCharacter}!</h2>
     ${imageHTML}
   `;
+
+  logResult(topCharacter);
 }
 
-window.onload = showQuestion;
+function logResult(character) {
+  if (!SHEETS_URL || SHEETS_URL === "YOUR_WEB_APP_URL_HERE") return;
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    quiz: getQuizName(),
+    character: character
+  };
+
+  fetch(SHEETS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(err => console.warn("Could not log result:", err));
+}
+
+window.onload = function () {
+  quizName = getQuizName();
+  showQuestion();
+};
